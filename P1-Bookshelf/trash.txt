@@ -1,0 +1,19 @@
+
+    queryBooks = (query) => {
+      this.setState({query: query})
+      search(query).then((res) => {
+        console.log('res', res)
+        this.setState({booksInSearch: res})
+        console.log(this.state)
+      }).then((data) => {
+        console.log('data', data)
+      })
+    }
+
+    deleteBook = (bookTitle) => {
+      this.setState((prevState) => (
+        {
+          books: prevState.books.filter((b) => b.title !== bookTitle)
+        }
+      ))
+    }
