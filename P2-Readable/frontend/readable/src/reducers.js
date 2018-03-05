@@ -1,16 +1,27 @@
+import { combineReducers } from 'redux'
+import { ADD_POST, RECEIVE_POSTS, ADD_USER } from './actions.js'
 
-import { ADD_POST } from './actions.js'
-
-const initialState = {posts: []}
-
-export function reducer(state=initialState, action){
+function posts(state=[], action){
   switch(action.type) {
     case ADD_POST:
-      return {
-        ...state,
-        posts: state.posts.concat(action.post)
-      }
+      return state.concat(action.post)
+    case RECEIVE_POSTS:
+      return action.posts
     default:
       return state
   }
 }
+
+function users(state=[], action){
+  switch(action.type) {
+    case ADD_USER:
+      return state.concat(action.user)
+    default:
+      return state
+  }
+}
+
+export default combineReducers({
+  posts,
+  users,
+})

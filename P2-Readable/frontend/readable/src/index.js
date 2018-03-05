@@ -4,20 +4,30 @@ import './index.css';
 import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 
-import { createStore } from 'redux';
-import { reducer }  from './reducers'
-import { addPost } from './actions'
+// redux L2
+import { createStore, applyMiddleware, compose } from 'redux';
+import reducers  from './reducers';
+import { addPost } from './actions';
+
+// redux L3
+import { Provider, connect } from 'react-redux';
+import logger from 'redux-logger'
+import thunk from 'redux-thunk'
+import { BrowserRouter } from 'react-router-dom'
 
 const store = createStore(
-  reducer,
-  window.__REDUX_DEVTOOLS_EXTENSION__ && window.__REDUX_DEVTOOLS_EXTENSION__()
+  reducers,
+  compose(
+    applyMiddleware(thunk, logger),
+    window.__REDUX_DEVTOOLS_EXTENSION__()
+  )
 )
 
-let post = 'This is a post'
-store.dispatch(addPost(post))
+console.log(store.getState())
 
-//console.log(store.getState())
-//console.log(store)
-
-ReactDOM.render(<App store={store}/>, document.getElementById('root'));
+ReactDOM.render(
+  <Provider store={store}>
+      <App />
+  </Provider>, document.getElementById('root')
+);
 registerServiceWorker();
