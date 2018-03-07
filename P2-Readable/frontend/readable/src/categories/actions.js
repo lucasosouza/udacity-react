@@ -2,13 +2,13 @@ import * as dataAPI from '../dataAPI.js'
 
 export const RECEIVE_CATEGORIES = 'RECEIVE_CATEGORIES'
 
-export const receiveCategories = (posts) => ({
+export const receiveCategories = (categories) => ({
   type: RECEIVE_CATEGORIES,
-  categories
+  categories,
 })
 
-export const fetchCategories = () => dispatch => {
+export const getCategories = () => dispatch => {
   dataAPI
-    .fetchCategories()
-    .then(data => dispatch(receiveCategories(data)))
+    .getCategories()
+    .then(data => dispatch(receiveCategories(data.categories)))
 }

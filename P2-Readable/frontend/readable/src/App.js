@@ -1,83 +1,100 @@
 import React, { Component } from 'react';
-import logo from './logo.svg';
 import './App.css';
-import { addPost, getPosts, receivePosts} from './actions.js';
+import logo from './logo.svg';
 import { connect } from 'react-redux';
-import Post from './Post.js'
 import { BrowserRouter, Link, Route } from 'react-router-dom'
-import * as dataAPI from './dataAPI.js'
 
+import { getCategories } from './categories/actions.js';
+import { addPost, getPosts, getPostsPerCategory } from './posts/actions.js'
+import Post from './posts/Post.js'
+import EditPost from './posts/EditPost.js'
+import AddPost from './posts/AddPost.js'
 
 class App extends Component {
 
-  state = {
-    newPost: '',
-    pts: []
+  componentWillMount(){
+    this.props.getCategories()
+    this.props.getPosts()
+    console.log(this.props)
   }
-
-  // componentDidMount(){
-  //   const {store} = this.props
-  //   store.subscribe(() => {
-  //     this.setState({
-  //       posts: store.getState().posts
-  //     })
-  //   })
-  // }
 
   render() {
     return (
       <BrowserRouter>
-        <div className="App">
-          <Route exact
-            path="/"
-            render={({history}) => (
-                <div>
-                  <header className="App-header">
-                    <img src={logo} className="App-logo" alt="logo" />
-                    <h1 className="App-title">Welcome to React</h1>
-                  </header>
-
-                  <button onClick={() => this.props.getPosts()}>Recupera posts</button>
-                  <p className="App-intro">
-                    To get started, edit <code>src/App.js</code> and save to reload.
-                  </p>
-                  <input value={this.state.newPost} onChange={(event) => this.setState({newPost: event.target.value})}/>
-                  <button onClick={() => this.props.addPost(this.state.newPost)}>Aperte aqui, com carinho</button>
-                  <br/>
-                  <p> {`/post/${this.state.newPost}`}</p>
-                  <Link to={`/post/${this.state.newPost}`}>Show Post</Link>
-                </div>
+        <div className='container'>
+          <h1>Super Duper Topper App</h1>
+          <span><strong>Filter posts by category: </strong></span>
+          { this.props.categories.map((cat) => (
+            <span>
+              <Link to={`/${cat.name}`} key={cat.path}>{cat.name}</Link>
+              <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+            </span>
+          ))}
+          <Link to="/">show all</Link>
+          <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+          <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+          <span>&nbsp;&nbsp;&nbsp;&nbsp;</span>
+          <Link to="/add">
+            <button>+ Add new post</button>
+          </Link>
+          <p></p>
+          <Route
+            exact path='/'
+            render={ () => (
+              <div>
+                <h2> All Posts </h2>
+                <hr/>
+                {this.props.posts.allPosts &&
+                  Object.entries(this.props.posts.allPosts).map(([postId, post]) =>
+                  <Post post={post} key={postId} />
+                )}
+              </div>
             )}
           />
           <Route
-            path="post/:id"
-            render={({match}) => (
+            exact path='/:category'
+            render={ ({match, history}) => (
               <div>
-                <Post/>
-                <p>{match.params.id}</p>
+                <h2>{ match.params.category }</h2>
+                <hr/>
+                {this.props.posts.allPosts &&
+                  Object.entries(this.props.posts.allPosts)
+                    .filter(([postId, post]) => post.category === match.params.category)
+                    .map(([postId, post]) =>
+                    <Post post={post} key={postId} /> )
+                }
               </div>
+            )}
+          />
+          <Route
+            path='/edit/:postId'
+            render={({match, history}) => (
+              <EditPost postId={match.params.postId} history={history} />
+            )}
+          />
+          <Route
+            path='/add'
+            render={({history}) => (
+              <AddPost history={history} />
             )}
           />
         </div>
       </BrowserRouter>
     );
   }
+
 }
 
 // can have complex state transformations here
-const mapStateToProps = ({posts, users}) => ({
+const mapStateToProps = ( {categories, posts} ) => ({
+  categories,
   posts,
-  users
 })
 
 // can have more complex functions here
 const mapDispatchToProps = dispatch => ({
-  addPost: data => dispatch(addPost(data)),
-  getPosts: data => (
-      dataAPI
-        .getPosts()
-        .then(posts => dispatch(receivePosts(posts)))
-      )
+  getCategories: () => dispatch(getCategories()),
+  getPosts: () => dispatch(getPosts())
 })
 
 export default connect(mapStateToProps, mapDispatchToProps)(App);

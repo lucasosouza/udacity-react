@@ -1,22 +1,18 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
 import registerServiceWorker from './registerServiceWorker';
-
-// redux L2
-import { createStore, applyMiddleware, compose } from 'redux';
-import reducers  from './reducers';
-import { addPost } from './actions';
-
-// redux L3
 import { Provider, connect } from 'react-redux';
 import logger from 'redux-logger'
 import thunk from 'redux-thunk'
-import { BrowserRouter } from 'react-router-dom'
+import { createStore, applyMiddleware, compose } from 'redux';
+
+// app specific
+import './index.css';
+import App from './App';
+import rootReducer from './root_reducer';
 
 const store = createStore(
-  reducers,
+  rootReducer,
   compose(
     applyMiddleware(thunk, logger),
     window.__REDUX_DEVTOOLS_EXTENSION__()
